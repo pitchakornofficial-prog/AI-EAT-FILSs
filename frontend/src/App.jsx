@@ -16,12 +16,16 @@ function App() {
   const [scanId, setScanId] = useState(null);
   const [scanResults, setScanResults] = useState([]);
   const [scanSummary, setScanSummary] = useState(null);
+  const [drives, setDrives] = useState([]);
+  const [defaultTarget, setDefaultTarget] = useState('');
+  const [selectedPath, setSelectedPath] = useState('');
   
   // Quarantine state
   const [quarantinedItems, setQuarantinedItems] = useState([]);
 
   useEffect(() => {
     fetchSystemStatus();
+    fetchDrives();
     fetchQuarantinedItems();
     
     // Auto-refresh status if scanning
@@ -41,12 +45,23 @@ function App() {
     }
   };
 
+  const fetchDrives = async () => {
+    try {
+      const res = await axios.get('/api/system/drives');
+      setDrives(res.data.drives);
+      setDefaultTarget(res.data.default);
+      if (!selectedPath) setSelectedPath(res.data.default);
+    } catch (err) {
+      console.error("Failed to fetch drives", err);
+    }
+  };
+
   const startScan = async () => {
     try {
       setScanning(true);
       setScanResults([]);
       setScanSummary(null);
-      const res = await axios.post('/api/scans', { min_size_mb: 50, use_ai: true });
+      const res = await axios.post('/api/scans', { min_size_mb: 50, use_ai: true, target_path: selectedPath });
       setScanId(res.data.scan_id);
     } catch (err) {
       console.error("Scan failed to start", err);
@@ -97,6 +112,21 @@ function App() {
     }
   };
 
+  const directDeleteItem = async (itemPath) => {
+    if (!window.confirm("Are you sure you want to delete this item? (It will be sent to the Recycle Bin)")) return;
+    
+    try {
+      await axios.post('/api/items/delete', { item_paths: [itemPath] });
+      // Refresh scan results
+      if (scanId) {
+         fetchScanResults(scanId);
+      }
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Failed to delete item directly.");
+    }
+  };
+
   const fetchQuarantinedItems = async () => {
     try {
       const res = await axios.get('/api/quarantine/items');
@@ -139,8 +169,8 @@ function App() {
       {/* Header */}
       <header className="flex justify-between items-center" style={{ marginBottom: '2rem' }}>
         <div className="flex items-center gap-4">
-          <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '0.75rem', borderRadius: '1rem' }}>
-            <Shield size={32} color="#3b82f6" />
+          <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '0.75rem', borderRadius: '1rem' }}>
+            <Shield size={32} color="var(--text-primary)" />
           </div>
           <div>
             <h1 className="text-gradient" style={{ fontSize: '1.875rem' }}>AI Storage Cleaner</h1>
@@ -151,7 +181,7 @@ function App() {
         {systemStatus && (
           <div className="flex gap-4">
             <div className="glass" style={{ padding: '0.5rem 1rem', borderRadius: '99px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: systemStatus.ollama.available ? '#10b981' : '#ef4444' }}></span>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: systemStatus.ollama.available ? 'var(--status-safe)' : 'var(--status-protected)' }}></span>
               <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                 Ollama: {systemStatus.ollama.available ? systemStatus.ollama.model : 'Offline'}
               </span>
@@ -185,14 +215,32 @@ function App() {
                 <h2>System Scan</h2>
                 <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Scan your Local AppData for safe-to-remove cache and temporary files.</p>
               </div>
-              <button 
-                className="btn btn-primary" 
-                onClick={startScan} 
-                disabled={scanning}
-                style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
-              >
-                {scanning ? <><Clock className="animate-spin" size={18} /> Scanning...</> : 'Start Scan'}
-              </button>
+              <div className="flex gap-4 items-center">
+                <input 
+                  type="text"
+                  className="input" 
+                  value={selectedPath} 
+                  onChange={(e) => setSelectedPath(e.target.value)}
+                  disabled={scanning}
+                  list="drives-list"
+                  placeholder="Enter path (e.g. C:\Users)"
+                  style={{ minWidth: '250px', padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-primary)' }}
+                />
+                <datalist id="drives-list">
+                  {defaultTarget && <option value={defaultTarget}>Default Target (AppData)</option>}
+                  {drives.map(drive => (
+                    <option key={drive} value={drive}>Drive {drive}</option>
+                  ))}
+                </datalist>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={startScan} 
+                  disabled={scanning}
+                  style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+                >
+                  {scanning ? <><Clock className="animate-spin" size={18} /> Scanning...</> : 'Start Scan'}
+                </button>
+              </div>
             </div>
 
             {scanning && scanStatus && (
@@ -259,6 +307,7 @@ function App() {
                       <th>Size</th>
                       <th>Status</th>
                       <th>Reason</th>
+                      <th style={{ textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -276,6 +325,16 @@ function App() {
                           </span>
                         </td>
                         <td style={{ color: 'var(--text-secondary)' }}>{item.reason}</td>
+                        <td style={{ textAlign: 'right' }}>
+                          <button 
+                            className="btn btn-outline btn-danger"
+                            style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderColor: 'var(--status-review)', color: 'var(--status-review)' }}
+                            onClick={() => directDeleteItem(item.full_path)}
+                            title="Delete Item directly (Send to Recycle Bin)"
+                          >
+                            <Trash2 size={14} /> Delete
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

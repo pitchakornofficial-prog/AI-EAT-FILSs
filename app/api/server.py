@@ -51,6 +51,9 @@ class DeleteRequest(BaseModel):
     quarantine_ids: List[str]
     permanent: bool = False
 
+class ItemDeleteRequest(BaseModel):
+    item_paths: List[str]
+
 # ── State ──────────────────────────────────────────────────────────────
 
 # Simple in-memory tracker for long-running scans
@@ -81,6 +84,16 @@ def get_system_status():
         "safety_engine": safety_stats,
         "quarantine": q_stats
     }
+
+@app.get("/api/system/drives")
+def get_drives():
+    """Get available drives on Windows."""
+    import string
+    drives = []
+    for d in string.ascii_uppercase:
+        if os.path.exists(f"{d}:\\"):
+            drives.append(f"{d}:\\")
+    return {"drives": drives, "default": os.environ.get("LOCALAPPDATA", "")}
 
 def run_scan_task(scan_id: str, target_path: str, min_size_mb: int, use_ai: bool):
     """Background task to run the full scan pipeline."""
@@ -308,5 +321,24 @@ def delete_items(request: DeleteRequest):
             success += 1
         else:
             errors.append({"quarantine_id": q_id, "error": res["message"]})
+            
+    return {"status": "success", "deleted_count": success, "errors": errors}
+
+@app.post("/api/items/delete")
+def direct_delete_items(request: ItemDeleteRequest):
+    """Directly delete items to Recycle Bin without quarantining."""
+    import send2trash
+    success = 0
+    errors = []
+    
+    for path in request.item_paths:
+        try:
+            if os.path.exists(path):
+                send2trash.send2trash(path)
+                success += 1
+            else:
+                errors.append({"path": path, "error": "File/Folder not found"})
+        except Exception as e:
+            errors.append({"path": path, "error": str(e)})
             
     return {"status": "success", "deleted_count": success, "errors": errors}
