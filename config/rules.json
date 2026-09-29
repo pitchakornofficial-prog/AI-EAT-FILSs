@@ -1,0 +1,183 @@
+{
+    "_comment": "AI Storage Cleaner - Classification Rules. Pattern-based rules for fast pre-classification without AI.",
+
+    "safe_patterns": {
+        "_description": "Files/folders that are SAFE to remove (cache, temp, can be regenerated)",
+        "folder_names": [
+            "DXCache",
+            "GLCache",
+            "ShaderCache",
+            "GPUCache",
+            "GpuCache",
+            "shader-cache",
+            "gpu-process-crash",
+            "CrashDumps",
+            "CrashReports",
+            "crash-reports",
+            "CrashPad",
+            "Crashpad",
+            "Cache",
+            "cache",
+            "Code Cache",
+            "ScriptCache",
+            "cache2",
+            "webcache",
+            "LocalCache",
+            "blob_storage",
+            "Service Worker",
+            "Temp",
+            "temp",
+            "tmp",
+            "Tmp",
+            "__pycache__",
+            ".cache",
+            "node_modules/.cache",
+            "pip-cache",
+            "npm-cache",
+            "_npx",
+            "d3dscache",
+            "D3DSCache",
+            "EGL_CACHE",
+            "CompositorTileCache",
+            "thumbnails"
+        ],
+        "folder_name_contains": [
+            "cache",
+            "Cache",
+            "tmp",
+            "temp",
+            "Temp",
+            "crash",
+            "Crash"
+        ],
+        "file_extensions": [
+            ".tmp",
+            ".temp",
+            ".log",
+            ".dmp",
+            ".mdmp",
+            ".etl",
+            ".bak",
+            ".old",
+            ".cache",
+            ".crdownload",
+            ".partial"
+        ],
+        "file_name_patterns": [
+            "*.tmp",
+            "*.temp",
+            "CrashDump-*",
+            "crash-*.dmp",
+            "~$*"
+        ]
+    },
+
+    "review_patterns": {
+        "_description": "Files/folders that MIGHT be removable but need human review",
+        "folder_names": [
+            "Installer",
+            "installer",
+            "Update",
+            "update",
+            "Updater",
+            "updater",
+            "Downloads",
+            "OldVersion",
+            "old",
+            "backup",
+            "Backup",
+            "Previous",
+            "Setup",
+            "setup",
+            "Packages",
+            "packages",
+            "Archives"
+        ],
+        "folder_name_contains": [
+            "install",
+            "Install",
+            "setup",
+            "Setup",
+            "update",
+            "Update",
+            "old",
+            "Old",
+            "previous",
+            "Previous"
+        ],
+        "file_extensions": [
+            ".exe",
+            ".msi",
+            ".msix",
+            ".appx",
+            ".cab",
+            ".whl",
+            ".tar.gz",
+            ".zip"
+        ]
+    },
+
+    "protected_patterns": {
+        "_description": "Files/folders that must NEVER be touched",
+        "folder_names": [
+            "saves",
+            "Saves",
+            "SaveGames",
+            "SavedGames",
+            "save",
+            "profiles",
+            "Profiles",
+            "User Data",
+            "userData",
+            "config",
+            "Config",
+            "Settings",
+            "settings",
+            "Preferences",
+            "models",
+            "Models",
+            "manifests",
+            "blobs"
+        ],
+        "file_extensions": [
+            ".dll",
+            ".sys",
+            ".exe",
+            ".dat",
+            ".reg",
+            ".ini",
+            ".cfg",
+            ".conf",
+            ".json",
+            ".xml",
+            ".yaml",
+            ".yml",
+            ".toml",
+            ".db",
+            ".sqlite",
+            ".sqlite3"
+        ]
+    },
+
+    "size_thresholds": {
+        "_description": "Size thresholds in bytes for prioritizing scan results",
+        "minimum_report_size_mb": 50,
+        "large_folder_mb": 500,
+        "very_large_folder_mb": 1000
+    },
+
+    "known_applications": {
+        "_description": "Known application folder mappings for better classification",
+        "NVIDIA Corporation": { "type": "GPU Driver", "safe_subfolders": ["DXCache", "GLCache", "ShaderCache"] },
+        "NVIDIA": { "type": "GPU Driver", "safe_subfolders": ["DXCache", "GLCache"] },
+        "Google": { "type": "Application Suite", "safe_subfolders": ["CrashReports", "SwReporter"] },
+        "Microsoft": { "type": "System/Application", "safe_subfolders": ["Temp"] },
+        "Mozilla Firefox": { "type": "Web Browser", "safe_subfolders": ["cache2"] },
+        "Temp": { "type": "Temporary Files", "safe_subfolders": [] },
+        "D3DSCache": { "type": "DirectX Shader Cache", "safe_subfolders": [] },
+        "CrashDumps": { "type": "Crash Dumps", "safe_subfolders": [] },
+        "pip": { "type": "Python Package Manager", "safe_subfolders": ["cache", "http"] },
+        "npm-cache": { "type": "Node.js Package Manager", "safe_subfolders": ["_cacache"] },
+        "yarn": { "type": "Node.js Package Manager", "safe_subfolders": ["Cache"] }
+    }
+}

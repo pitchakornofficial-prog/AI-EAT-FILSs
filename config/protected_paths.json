@@ -1,0 +1,83 @@
+{
+    "_comment": "AI Storage Cleaner - Protected Paths Configuration. These paths will NEVER be modified or deleted.",
+
+    "system_paths": [
+        "C:\\Windows",
+        "C:\\Program Files",
+        "C:\\Program Files (x86)",
+        "C:\\ProgramData",
+        "C:\\Recovery",
+        "C:\\$Recycle.Bin"
+    ],
+
+    "user_critical_paths": [
+        "{user_home}\\Desktop",
+        "{user_home}\\Documents",
+        "{user_home}\\Downloads",
+        "{user_home}\\Pictures",
+        "{user_home}\\Videos",
+        "{user_home}\\Music",
+        "{user_home}\\Saved Games",
+        "{user_home}\\Favorites",
+        "{user_home}\\Links",
+        "{user_home}\\Contacts",
+        "{user_home}\\Searches",
+        "{user_home}\\OneDrive"
+    ],
+
+    "appdata_protected": [
+        "{user_home}\\AppData\\Roaming",
+        "{user_home}\\AppData\\LocalLow"
+    ],
+
+    "application_data_paths": [
+        "{appdata_local}\\Microsoft",
+        "{appdata_local}\\Google\\Chrome\\User Data\\Default\\Bookmarks",
+        "{appdata_local}\\Google\\Chrome\\User Data\\Default\\Login Data",
+        "{appdata_local}\\Google\\Chrome\\User Data\\Default\\Preferences",
+        "{appdata_local}\\Mozilla\\Firefox\\Profiles"
+    ],
+
+    "gaming_paths": [
+        "{appdata_local}\\Packages\\Microsoft.MinecraftUWP*",
+        "{user_home}\\AppData\\Roaming\\.minecraft\\saves",
+        "{user_home}\\AppData\\Roaming\\.minecraft\\resourcepacks",
+        "{user_home}\\AppData\\Roaming\\.minecraft\\mods",
+        "C:\\Program Files (x86)\\Steam\\steamapps",
+        "C:\\Program Files\\Steam\\steamapps",
+        "{appdata_local}\\Steam"
+    ],
+
+    "ai_ml_paths": [
+        "{user_home}\\.ollama\\models",
+        "{appdata_local}\\Ollama",
+        "{appdata_local}\\Programs\\Ollama"
+    ],
+
+    "development_paths": [
+        "{user_home}\\.ssh",
+        "{user_home}\\.gitconfig",
+        "{user_home}\\.git-credentials",
+        "{appdata_local}\\Programs\\Python",
+        "{appdata_local}\\Programs\\Microsoft VS Code"
+    ],
+
+    "protected_extensions": [
+        ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+        ".pdf", ".odt", ".ods",
+        ".key", ".pem", ".crt", ".cer", ".pfx",
+        ".kdbx", ".keychain",
+        ".sqlite", ".db", ".mdb",
+        ".sav", ".save"
+    ],
+
+    "protected_filenames": [
+        "NTUSER.DAT",
+        "ntuser.ini",
+        "desktop.ini",
+        "Thumbs.db",
+        "hiberfil.sys",
+        "pagefile.sys",
+        "swapfile.sys"
+    ]
+}
