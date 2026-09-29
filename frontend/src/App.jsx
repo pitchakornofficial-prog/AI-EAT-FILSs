@@ -245,9 +245,47 @@ function App() {
 
             {scanning && scanStatus && (
               <div style={{ marginTop: '2rem' }}>
-                <div className="flex justify-between" style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                <div className="flex items-center" style={{ marginBottom: '1.5rem', padding: '1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.75rem', border: '1px solid var(--border)', overflowX: 'auto' }}>
+                  {['1. Scan Files', '2. Rules Analysis', '3. AI Analysis', '4. Complete'].map((step, idx, arr) => {
+                    let isActive = false;
+                    let isPast = false;
+                    
+                    const p = scanStatus.progress;
+                    if (idx === 0) { isActive = p < 30; isPast = p >= 30; }
+                    else if (idx === 1) { isActive = p >= 30 && p < 60; isPast = p >= 60; }
+                    else if (idx === 2) { isActive = p >= 60 && p < 100; isPast = p === 100; }
+                    else if (idx === 3) { isActive = p === 100; isPast = false; }
+                    
+                    const color = isActive ? 'var(--text-primary)' : isPast ? 'var(--text-primary)' : 'var(--text-muted)';
+                    const fontWeight = isActive ? '600' : '400';
+                    const iconBg = isActive ? 'var(--text-primary)' : isPast ? 'var(--text-primary)' : 'transparent';
+                    const iconColor = isActive || isPast ? 'var(--bg-primary)' : 'var(--text-muted)';
+                    
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', flex: idx === arr.length - 1 ? '0 0 auto' : '1 1 auto' }}>
+                        <div style={{ color, fontWeight, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ 
+                            width: '28px', height: '28px', borderRadius: '50%', 
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: iconBg,
+                            color: iconColor,
+                            border: `1px solid ${isActive || isPast ? 'transparent' : 'var(--border)'}`,
+                            fontSize: '0.875rem'
+                          }}>
+                            {isPast ? '✓' : idx + 1}
+                          </div>
+                          <span style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{step.split('. ')[1]}</span>
+                        </div>
+                        {idx < arr.length - 1 && (
+                          <div style={{ height: '1px', flex: 1, background: isPast ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)', margin: '0 1rem' }} />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="flex justify-between" style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                   <span>{scanStatus.message}</span>
-                  <span>{scanStatus.progress}%</span>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{scanStatus.progress}%</span>
                 </div>
                 <div className="progress-bg">
                   <div className="progress-fill" style={{ width: `${scanStatus.progress}%` }}></div>
